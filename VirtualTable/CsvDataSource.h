@@ -111,7 +111,7 @@ private:
     mutable QFile m_file;             // 文件对象
     bool m_hasHeader;                 // 是否包含表头
     char m_delimiter;                 // 分隔符
-    int m_rowCount;                   // 总行数
+    int m_rowCount;                   // 总行数，-1表示未计算
     int m_columnCount;                // 总列数
     QList<QString> m_headers;         // 表头信息
     bool m_isValid;                   // 文件是否有效
@@ -119,7 +119,6 @@ private:
     mutable QMutex m_mutex;           // 互斥锁，用于线程安全
 
     // 内存映射相关
-    uchar* m_mappedData;              // 映射到内存的数据
     qint64 m_fileSize;                // 文件大小
     std::vector<qint64> m_rowOffsets; // 存储每行的偏移量，用于快速定位
 
@@ -127,6 +126,12 @@ private:
     int m_maxCacheSize;               // 最大缓存行数
     QHash<int, QList<QVariant>> m_rowCache; // 行缓存
     QList<int> m_cacheOrder;          // 缓存顺序，用于LRU缓存策略
+
+private:
+    // 辅助方法
+    bool ensureRowOffsetCalculated(int rowIndex);
+    void ensureRowOffsetsCalculated(int startRow, int endRow);
+    void calculateRowCount();
 };
 
 #endif // CSVDATASOURCE_H
